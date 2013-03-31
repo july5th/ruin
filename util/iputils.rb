@@ -1,4 +1,5 @@
 require 'resolv'
+require 'util/logutils'
 
 module RUIN
 module UTIL
@@ -10,8 +11,16 @@ class IpUtils
 	ip_str.match(reg)
     end
 
-    def self.check_ip_connection(ip, port)
-	"adf"
+    def self.check_ip_connection(ip, port, time_out)
+	begin
+		Timeout::timeout(time_out){TCPSocket.new(ip, port)}
+		return true
+	rescue Timeout::Error
+		return false
+	rescue => err
+		RUIN::UTIL::Logutils.error(err)
+		return false
+	end
     end
 
     def self.get_ip_from_dns(domain_str)
