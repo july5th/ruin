@@ -9,7 +9,7 @@ module DAEMON
 class HttpProxy
 
     def initialize()
-	@logger = RUIN::UTIL::Logutils.instance
+	@logger = RUIN::UTIL::LogUtils.instance
 	@logger.info("Init http proxy module.")
 	@check_ip_addr = "http://iframe.ip138.com/ic.asp"
 	@agent = Mechanize.new

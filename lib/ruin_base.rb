@@ -1,4 +1,6 @@
-require "model"
-require "utils"
-require "config"
-require "proxy"
+module RUIN
+	autoload :MODEL, 'model'
+	autoload :UTIL, "utils"
+	autoload :CONFIG, "config"
+	autoload :PROXY, "proxy"
+end

@@ -18,7 +18,7 @@ class IpUtils
 	rescue Timeout::Error
 		return false
 	rescue => err
-		RUIN::UTIL::Logutils.error(err)
+		RUIN::UTIL::LogUtils.error(err)
 		return false
 	end
     end

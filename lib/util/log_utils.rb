@@ -3,13 +3,13 @@ require 'logger'
 module RUIN
 module UTIL
 
-class Logutils
+class LogUtils
 
     def initialize
 	@logger = Logger.new(STDOUT)
     end
 
-    @@instance = Logutils.new
+    @@instance = LogUtils.new
   
     def self.instance
 	return @@instance
@@ -28,15 +28,15 @@ class Logutils
     end
 
     def self.info(msg)
-	Logutils.instance.info(msg)
+	LogUtils.instance.info(msg)
     end
 
     def self.error(msg)
-	Logutils.instance.error(msg)
+	LogUtils.instance.error(msg)
     end
 
     def self.debug(msg)
-	Logutils.instance.debug(msg)
+	LogUtils.instance.debug(msg)
     end
 
 end

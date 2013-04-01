@@ -4,7 +4,7 @@ module CONFIG
 ProxyDaemonMaxThread = 100
 ProxyMaxTimeOut = 5
 
-DaemonSleepTime = 10
+DaemonSleepTime = 300
 
 end
 end
