@@ -10,7 +10,7 @@ end
 
 $:.unshift(@ruinbase_dir)
 
-require "proxy/httpproxy"
+require "demo/proxy_demo"
 
 
 p = RUIN::PROXY::HttpProxy.new
