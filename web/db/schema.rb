@@ -11,15 +11,17 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130418065218) do
+ActiveRecord::Schema.define(:version => 20130419093408) do
 
   create_table "proxies", :force => true do |t|
-    t.string   "ip",         :null => false
-    t.integer  "port",       :null => false
+    t.string   "ip",                        :null => false
+    t.integer  "port",                      :null => false
+    t.integer  "level",      :default => 0
+    t.integer  "error",      :default => 0
     t.string   "addr"
     t.string   "addtion"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",                :null => false
+    t.datetime "updated_at",                :null => false
   end
 
 end

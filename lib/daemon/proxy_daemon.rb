@@ -1,14 +1,10 @@
 require 'mechanize'
-require 'logger'
 require "thread"
-
-require 'util/ip_utils'
-require 'util/log_utils'
-
+require 'find'
 require 'ruin_base'
 
 module RUIN
-module PROXY
+module DAEMON
 
 class HttpProxy
 
@@ -22,10 +18,15 @@ class HttpProxy
 	@old2_ip_hash = {}
 	@ip_hash = {}
 	@real_ip = get_real_ip(@agent)
-	@time_out = 5
+	@time_out = RUIN::CONFIG::ProxyMaxTimeOut
 	@tmp_ip_hash_mutex = Mutex.new
 	@ip_hash_mutex = Mutex.new
+	load_plugins
+    end
 
+    def load_plugins
+	plugins_path = File.expand_path(File.join(File.dirname(__FILE__) , 'proxy'))
+	Find.find(plugins_path) {|x| require x if File.file?(x)}
     end
 
     def run()
@@ -40,33 +41,17 @@ class HttpProxy
 	add_http_proxy
 	@logger.info("New http proxy ip num: #{@ip_hash.count}")
     	print_proxy
+	clear
     end
 
     def add_http_proxy()
-	init_http_proxy_from_51proxy()
+	self.methods.grep(/init_http_proxy_from/).each { |method| self.send method }
 	@logger.debug("Starting check proxy ip!")
 	check_proxy
 	@logger.debug("End collect http proxy IP... NUM:" + @ip_hash.count.to_s)
 	store_proxy_ip
     end
 	
-    def init_http_proxy_from_51proxy()
-	@logger.debug("Start collect http proxy IP from 51proxy...")
-	begin
-		content = @agent.get("http://51dai.li/http_anonymous.html")
-		content.root.search('table/tr').each {|e| 
-			proxy_ip_list = e.text.gsub(/\t/,'').strip.split("\n")
-			if proxy_ip_list.count == 4 then
-				@logger.debug(proxy_ip_list.join("=>"))
-				store_tmp_ip_hash(proxy_ip_list[1], proxy_ip_list[2])
-			end
-		}
-	rescue => err
-		@logger.error("Some error happend when collect http proxy IP from 51proxy...")
-		@logger.error(err)
-	end
-    end
-
     def store_tmp_ip_hash(ip, port)
 	return unless ip
 	return unless port
@@ -77,7 +62,7 @@ class HttpProxy
 
     def check_proxy()
 	ts = []
-	0.upto(RUIN::CONFIG::ProxyMaxThread){
+	0.upto(RUIN::CONFIG::ProxyDaemonMaxThread){
 		ts<<Thread.start { |x|
 		@logger.debug("start check thread : #{x}")
 		agent = Mechanize.new
@@ -127,17 +112,34 @@ class HttpProxy
 
     def load_old_proxy()
 	RUIN::MODEL::Proxy.all.each { |p|
-                @logger.info("Load old proxy: #{p.ip} : #{p.port}")
-		@tmp_ip_hash.store(p.ip, p.port)
-		@old_ip_hash.store(p.ip, p.port)
+		if @tmp_ip_hash.has_key?(p.ip) then
+			p.delete
+		else
+                	@logger.info("Load old proxy: #{p.ip} : #{p.port}")
+			@tmp_ip_hash.store(p.ip, p.port)
+			@old_ip_hash.store(p.ip, p.port)
+		end
         }
     end
 
     def del_old_proxy()
 	@old_ip_hash.each { |ip, port| 
 		if not @ip_hash.has_key?(ip) then
-			@logger.info("Delete old proxy: #{ip} : #{port}")
-			RUIN::MODEL::Proxy.find_by_ip(ip).delete
+			p = RUIN::MODEL::Proxy.find_by_ip(ip)
+			if p.level <= 0 or p.error >=3 then
+				@logger.info("Delete old proxy: #{ip} : #{port}")
+				p.delete
+			else
+				p.error += 1
+				p.level -= 1
+				@logger.info("Down proxy level: #{ip} : #{port} To #{p.level}(#{p.error})")
+				p.save
+			end
+		else
+			p = RUIN::MODEL::Proxy.find_by_ip(ip)
+			p.level += 1
+			p.error = 0
+			p.save
 		end
 	}
 	@old2_ip_hash.clear
@@ -153,6 +155,8 @@ class HttpProxy
 		p = RUIN::MODEL::Proxy.new
 		p.ip = ip
 		p.port = port
+		p.level = 0
+		p.error = 0
 		p.save
 	}
     end
@@ -163,6 +167,11 @@ class HttpProxy
         }
     end
 
+    def clear()
+	@tmp_ip_hash.clear
+        @old_ip_hash.clear
+        @old2_ip_hash.clear
+    end
 end
 
 end
