@@ -8,7 +8,7 @@ end
 
 @ruinbase_dir = File.dirname(ruinbase)
 $:.unshift(File.expand_path(File.join(File.dirname(@ruinbase_dir) , 'lib')))
-
+puts $:
 require "daemon"
 
 RUIN::DAEMON::Daemon.run

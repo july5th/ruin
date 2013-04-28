@@ -1,0 +1,70 @@
+module RUIN
+module REGISTER
+
+class WangYi163
+    include Capybara::DSL
+
+    def initialize(host = nil, port = nil)
+	@register_addr = "http://reg.email.163.com/unireg/call.do?cmd=register.entrance"
+	@isRegist = false
+	@x = 390
+	@y = 460
+	@icode_width = 122
+	@icode_height = 52
+	if port and host then
+		Capybara.register_driver :poltergeist do |app|
+			options = {
+				:phantomjs_options => [
+					"--proxy=#{host}:#{port}",
+					"--proxy-type=http",
+					"--load-images=no"
+				],
+				:inspector => true
+			}
+			Capybara::Poltergeist::Driver.new(app, options)
+		end
+	end
+	page.driver.headers = { "User-Agent" => "Mozilla/5.0 (X11; Linux x86_64; rv:18.0) Gecko/20100101 Firefox/18.0 Iceweasel/18.0.1" }
+        visit(@register_addr)
+    end
+
+    def get_icode
+	page.find(:xpath, "//a[@class='a1']").click
+	@icode_filename = RUIN::CONFIG::ICodeDir + RUIN::UTIL::RandomUtils.get_char_and_number(12) + ".png"
+	puts @icode_filename
+	page.save_screenshot(@icode_filename)
+	RUIN::UTIL::ImageUtils.cut(@icode_filename, @x, @y, @icode_width, @icode_height)
+    end
+
+    def register(icode)
+	loop do 
+		@username = RUIN::UTIL::RandomUtils.get_chars(12)
+		@password = RUIN::UTIL::RandomUtils.get_char_and_number(12)
+		page.find_by_id("nameIpt").click
+		page.find_by_id("nameIpt").set @username
+		page.find_by_id("mainPwdIpt").click
+		page.find_by_id("mainPwdIpt").set @password
+		page.find_by_id("mainCfmPwdIpt").click
+		page.find_by_id("mainCfmPwdIpt").set @password
+		fill_in "vcode", :with => icode
+		puts "one"
+		break if check
+	end
+	page.find_by_id("mainRegA").click
+	puts "regist with #{@username} : #{@password}"
+	sleep(5)
+	puts page.current_url
+	page.save_screenshot('/root/1.png')
+    end
+
+    def check
+	begin
+		return false if page.find_by_id('conflictDiv').visible?
+	rescue => err
+		return true
+	end
+    end
+end
+
+end
+end

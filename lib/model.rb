@@ -6,6 +6,8 @@ module RUIN
 module MODEL
 
 	autoload :Proxy, 'model/proxy'
+	autoload :Email, 'model/email'
+	autoload :Emailtype, 'model/emailtype'
 
 end
 end

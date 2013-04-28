@@ -1,19 +1,13 @@
-require "headless"
-headless = Headless.new(display:99)
-headless.start
-at_exit{ headless.destroy }
-
 require 'capybara'
-require 'capybara/dsl'
-require 'capybara-webkit'
+require 'capybara/poltergeist'
 
-Capybara.run_server = false
-Capybara.current_driver = :webkit
+Capybara.current_driver = :poltergeist
 
 module RUIN
 module REGISTER
 	autoload :Sina, 'register/sina'
 	autoload :WangYi163, 'register/wangyi163'
-		
+	autoload :Test, 'register/test'
+	autoload :Base, 'register/base'
 end
 end

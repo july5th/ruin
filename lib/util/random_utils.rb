@@ -20,9 +20,9 @@ class RandomUtils
 
     def self.get_char_and_number(len = nil)
 	len = 8 + rand(5) unless len
-	chars = ("a".."z").to_a + ("A".."Z").to_a + ("0".."9").to_a
+	chars = ("0".."9").to_a + ("a".."z").to_a + ("A".."Z").to_a
 	newpass = ""
-	1.upto(len) { |i| newpass << chars[rand(chars.size-1)] }
+	1.upto(len) { |i| newpass << chars[rand(chars.size - 1)] }
 	return newpass
     end
 
