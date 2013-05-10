@@ -17,6 +17,7 @@ class HttpProxy
 	@old_ip_hash = {}
 	@old2_ip_hash = {}
 	@ip_hash = {}
+	@https_hash = {}
 	@real_ip = get_real_ip(@agent)
 	@time_out = RUIN::CONFIG::ProxyMaxTimeOut
 	@tmp_ip_hash_mutex = Mutex.new
@@ -43,6 +44,7 @@ class HttpProxy
     	print_proxy
 	clear
     end
+
 
     def add_http_proxy()
 	self.methods.grep(/init_http_proxy_from/).each { |method| self.send method }
@@ -81,9 +83,11 @@ class HttpProxy
 			end
 			next if @ip_hash.has_key?(ip)
 			next if @old2_ip_hash.has_key?(ip)
-			next unless check_proxy_func(ip, port, agent)
+			result = check_proxy_func(ip, port, agent)
+			next unless result
 			@ip_hash_mutex.synchronize {
 				@ip_hash.store(ip, port)
+				@https_hash.store(ip, port) if result == "https"
 			}
 		end
 		}
@@ -96,18 +100,27 @@ class HttpProxy
 		return false unless RUIN::UTIL::IpUtils.check_ip_connection(ip, port, @time_out)
 		agent.set_proxy(ip, port)
 		return false if Timeout::timeout(@time_out){get_real_ip(agent) != ip}
-		return true
 	rescue Timeout::Error
 		return false
 	rescue => err
 		@logger.error("Some error happend when check #{ip}:#{port}")
-                @logger.error(err)
 		return false
+	end
+
+	begin
+		Timeout::timeout(@time_out){check_if_https(agent)}
+		return "https"
+	rescue => err
+		return "http"
 	end
     end
 
     def get_real_ip(agent)
         agent.get(@check_ip_addr).search("body").text.scan(/\d+/).join(".")
+    end
+
+    def check_if_https(agent)
+	agent.get("https://www.battlenet.com.cn/account/creation/tos.html")
     end
 
     def load_old_proxy()
@@ -139,6 +152,7 @@ class HttpProxy
 			p = RUIN::MODEL::Proxy.find_by_ip(ip)
 			p.level += 1
 			p.error = 0
+			p.https = 1 if @https_hash.has_key?(ip)
 			p.save
 		end
 	}
@@ -157,6 +171,7 @@ class HttpProxy
 		p.port = port
 		p.level = 0
 		p.error = 0
+		p.https = 1 if @https_hash.has_key?(ip)
 		p.save
 	}
     end
@@ -171,6 +186,7 @@ class HttpProxy
 	@tmp_ip_hash.clear
         @old_ip_hash.clear
         @old2_ip_hash.clear
+	@https_hash.clear
     end
 end
 

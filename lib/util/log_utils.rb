@@ -20,7 +20,7 @@ class LogUtils
     end
 
     def error(msg)
-	@logger.error(msg)
+	#@logger.error(msg)
     end
 
     def debug(msg)

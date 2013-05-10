@@ -16,6 +16,7 @@ class WangYi163 < RUIN::REGISTER::Base
 	@icode_height = 52
 	super(host, port)
 	page.find(:xpath, "//a[@class='a1']").click
+	page.save_screenshot("/root/t.png")
     end
 
     def register(icode)
@@ -59,15 +60,16 @@ class WangYi163 < RUIN::REGISTER::Base
 	while not result do
 		sleep(1)
 		loop_time += 1
-		break if loop_time > 10
+		break if loop_time > 3
 		@logger.info("loop for result 163")
 		begin
 			page.find_by_id("mainRegA").click
 		rescue => err
-			@logger.info("click error")
+			break
 		end
 		result = check_final
 	end
+
 
 	if result == 2 or result == 3 then
 		@logger.info("something wrong..")

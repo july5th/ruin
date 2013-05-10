@@ -13,7 +13,9 @@ require "ruin_base"
 
 #proxy = RUIN::PROXY::HttpProxy.get_proxy
 
-@c = RUIN::REGISTER::WangYi163.new("127.0.0.1", "8118")
+#@c = RUIN::REGISTER::WangYi163.new("127.0.0.1", "8118")
+@c = RUIN::REGISTER::WangYi163.new("114.80.209.78", "80")
+#@c = RUIN::REGISTER::WangYi163.new()
 def put_icode
 	puts @c.get_icode
 	icode = gets.chomp()

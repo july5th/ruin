@@ -19,14 +19,13 @@ ActiveRecord::Schema.define(:version => 20130426060836) do
     t.string   "email"
     t.string   "addtion"
     t.integer  "etype_id",   :null => false
-    t.integer  "check",      :null => false
+    t.integer  "check"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
   end
 
   create_table "emailtypes", :force => true do |t|
-    t.string   "name"
-    t.string   "false"
+    t.string   "name",       :null => false
     t.string   "pop3"
     t.string   "smtp"
     t.string   "addtion"
@@ -39,6 +38,7 @@ ActiveRecord::Schema.define(:version => 20130426060836) do
     t.integer  "port",                      :null => false
     t.integer  "level",      :default => 0
     t.integer  "error",      :default => 0
+    t.integer  "https",      :default => 0
     t.string   "addr"
     t.string   "addtion"
     t.datetime "created_at",                :null => false

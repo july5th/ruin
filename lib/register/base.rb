@@ -51,7 +51,10 @@ class Base
 		@logger.info("#{@plung_name}: start check with #{@username} : #{@password}")
 		if RUIN::EMAIL::Email.try_login(@username, @password, @email_type) then 
 			@logger.info("check pass for #{@username} : #{@password}")
-			return true 
+			return true
+		else
+			@logger.info("#{@plung_name}: check false for #{@username} : #{@password}")
+			return false
 		end
         rescue => err
 		@logger.info("#{@plung_name}: check false for #{@username} : #{@password}")

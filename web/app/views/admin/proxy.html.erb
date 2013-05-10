@@ -1,0 +1,26 @@
+<h1>Proxy list</h1>
+<p>tootle number: <%= @num %></p>
+<table class="table table-striped">
+  <tr>
+    <th>LEVEL</th>
+    <th>IP</th>
+    <th>PORT</th>
+    <th>HTTPS</th>
+    <th>create time</th>
+    <th>update time</th>
+  </tr>
+ 
+<% @proxys.each do |proxy| %>
+  <tr>
+    <td><%= proxy.level %></td>
+    <td><%= proxy.ip %></td>
+    <td><%= proxy.port %></td>
+    <td><%= proxy.https %></td>
+    <td><%= proxy.created_at %></td>
+    <td><%= proxy.updated_at %></td>
+  </tr>
+<% end %>
+</table>
+<center>
+<%= paginate @proxys %>
+</center>

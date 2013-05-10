@@ -1,0 +1,13 @@
+<h1>Email list</h1>
+<p>tootle number: <%= @emails.length %></p>
+<table class="table table-striped">
+  <tr>
+    <th>Email</th>
+  </tr>
+ 
+<% @emails.each do |email| %>
+  <tr>
+    <td><%= email.username + email.emailtype.addtion  %></td>
+  </tr>
+<% end %>
+</table>

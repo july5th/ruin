@@ -23,6 +23,15 @@ class HttpProxy
 	return {:ip => ip, :port => port}
     end
 
+    def self.get_https_proxy(level = 6, time_out = RUIN::CONFIG::ProxyMaxTimeOut)
+	num = (10 - level) * RUIN::MODEL::Proxy.all.count / 10
+	proxy_list = RUIN::MODEL::Proxy.get(https=1).limit(num).order('level desc')
+	id = rand(proxy_list.count - 1)
+	ip = proxy_list[id].ip
+	port = proxy_list[id].port
+	return {:ip => ip, :port => port}
+    end
+
     def set_proxy(ip = nil, port = nil)
 	if ip and port then
 		@ip = ip

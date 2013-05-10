@@ -6,7 +6,7 @@ class CreateEmails < ActiveRecord::Migration
       t.string :email
       t.string :addtion
       t.integer :etype_id, :null => false
-      t.integer :check,
+      t.integer :check
       t.timestamps
     end
   end

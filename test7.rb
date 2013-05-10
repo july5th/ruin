@@ -10,5 +10,4 @@ end
 $:.unshift(File.expand_path(File.join(File.dirname(@ruinbase_dir) , 'lib')))
 
 require "ruin_base"
-puts RUIN::MODEL::Email.save2("onf_558483", "IOa6LtT19flI")
-#puts RUIN::EMAIL::Email.try_login(2)
+require "model/init"
